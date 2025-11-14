@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Math Quiz Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            text-align: center;
+            padding: 80px;
+	    position: relative;
+            transition: background 0.3s ease;
+        }
+
+	.top-box {
+   		background: black;
+  		width: 400px;
+		height: 450px;
+    		padding: 50px;
+    		border-radius: 12px;
+    		box-shadow: 0 0 20px rgba(0,0,0,0.2);
+   		position: absolute; /* overlap */
+    		top: 50px; 
+    		left: 50%; 
+    		transform: translateX(-50%); 
+    		z-index: 0; 
+   	 	animation: fadeIn 0.6s ease;
+	}
+
+        .box {
+            background: lavender;
+            width: 350px;
+            margin: auto;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+            animation: fadeIn 0.6s ease;
+	    position: relative;  /* needed for z-index to work */
+   	    z-index: 1;
+        }
+	
+
+    #question {
+         margin-bottom: 45px;
+          }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.options button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: none;
+    background: slateBlue;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+
+    transition: transform 0.2s ease, background 0.2s;
+}
+
+/* Hover animation */
+.options button:hover {
+    background: hotPink;
+    transform: translateY(-5px);
+}
+
+/* Click animation */
+.options button:active {
+    transform: scale(0.9);
+}
+
+
+            transition: transform 0.2s ease, background 0.2s;
+        }
+
+        /* Hover animation */
+        .options button:hover {
+            background: #1e40af;
+            transform: translateY(-3px);
+        }
+
+        /* Click animation */
+        .options button:active {
+            transform: scale(0.95);
+        }
+
+        /* Feedback text animation */
+        #feedback {
+            font-size: 18px;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Screen flash animations */
+        .flash-correct {
+            animation: flashGreen 0.4s;
+        }
+        .flash-wrong {
+            animation: flashRed 0.4s;
+        }
+
+        @keyframes flashGreen {
+            0% { background: #d1fae5; }
+            100% { background: #f1f5f9; }
+        }
+
+        @keyframes flashRed {
+            0% { background: #fee2e2; }
+            100% { background: #f1f5f9; }
+        }
+
+        #score {
+            margin-top: 50px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-box">
+
+</div>
+
+<div class="box">
+    <h2>Math Quiz</h2>
+
+    <p id="question">Loading...</p>
+
+    <p id="chooseText">Select your answer</p>
+
+
+    <div class="options">
+        <button id="opt1" onclick="checkAnswer(this)"></button>
+        <button id="opt2" onclick="checkAnswer(this)"></button>
+        <button id="opt3" onclick="checkAnswer(this)"></button>
+    </div>
+
+    <p id="feedback"></p>
+    <p id="score">Score: 0</p>
+</div>
+
+<script>
+    let correctAnswer;
+    let score = 0;
+
+    function generateQuestion() {
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+
+        const operators = ["+", "-", "×"];
+        const operator = operators[Math.floor(Math.random() * operators.length)];
+
+        if (operator === "+") correctAnswer = num1 + num2;
+        if (operator === "-") correctAnswer = num1 - num2;
+        if (operator === "×") correctAnswer = num1 * num2;
+
+        document.getElementById("question").innerHTML =
+            `What is <b>${num1} ${operator} ${num2}</b>?`;
+
+        generateOptions();
+    }
+
+    function generateOptions() {
+        let answers = [];
+
+        answers.push(correctAnswer);
+
+        while (answers.length < 3) {
+            let wrong = Math.floor(Math.random() * 20) + 1;
+            if (!answers.includes(wrong)) answers.push(wrong);
+        }
+
+        answers.sort(() => Math.random() - 0.5);
+
+        document.getElementById("opt1").innerText = answers[0];
+        document.getElementById("opt2").innerText = answers[1];
+        document.getElementById("opt3").innerText = answers[2];
+    }
+
+    function checkAnswer(button) {
+        const chosen = Number(button.innerText);
+        const feedback = document.getElementById("feedback");
+
+        if (chosen === correctAnswer) {
+            feedback.style.color = "green";
+            feedback.innerHTML = "✔ Correct!";
+            document.body.classList.add("flash-correct");
+            score++;
+        } else {
+            feedback.style.color = "red";
+            feedback.innerHTML = `✘ Wrong! Correct: ${correctAnswer}`;
+            document.body.classList.add("flash-wrong");
+        }
+
+        feedback.style.opacity = 1;
+        document.getElementById("score").innerHTML = "Score: " + score;
+
+        setTimeout(() => {
+            feedback.style.opacity = 0;
+            document.body.classList.remove("flash-correct", "flash-wrong");
+            generateQuestion();
+        }, 700);
+    }
+
+    generateQuestion();
+</script>
+
+</body>
+</html>
